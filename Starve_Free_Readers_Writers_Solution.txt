@@ -1,0 +1,49 @@
+Shared Data: Database
+
+Semaphores:
+1. mutex : Mutually exclusive semaphore for updating readcount value.
+2. wrt : Mutually exclusive semaphore for writers.
+3. enter : Mutually exclusive semaphore for both readers and writers. Every reader and writer has equal chance of acquiring this semaphore.
+
+Initially:
+mutex = 1
+wrt = 1
+enter = 1
+readcount = 0
+
+--------------------------------------------
+
+Readers Process:
+
+wait(enter);
+wait(mutex);
+readcount++;
+
+if(readcount == 1)  wait(wrt);
+signal(mutex);
+signal(enter);
+
+/*  CRITICAL SECTION
+    Reading Database ... 
+*/
+
+wait(mutex);
+readcount--;
+if(readcount == 0)  signal(wrt);
+signal(mutex);
+
+--------------------------------------------
+
+Writers Process:
+
+wait(enter);
+wait(wrt);
+signal(enter);
+
+/*  CRITICAL SECTION
+    Writing Database ... 
+*/
+
+signal(wrt);
+
+---------------------------------------------
